@@ -26,3 +26,21 @@ fprintf('Free-space impedance: %.2f Ohms\n',eta0);
 fprintf('Layer 1 impedance: %.2f Ohms\n',eta1);
 fprintf('Layer 2 impedance: %.2f Ohms\n',eta2);
 fprintf('Substrate impedance: %.2f Ohms\n',etaL);
+
+% CALCULATE LAYER THICKNESSES
+
+d1 = c0/(4*f0*sqrt(eps1*mu1));
+d2 = c0/(4*f0*sqrt(eps2*mu2));
+
+fprintf('\nCOATING THICKNESSES\n');
+fprintf('Layer 1 thickness: %.4f m\n',d1);
+fprintf('Layer 2 thickness: %.4f m\n',d2);
+
+Zin2_design = eta2^2/etaL;
+Zin_design = eta1^2/Zin2_design;
+
+Gamma_design = (Zin_design-eta0)/(Zin_design+eta0);
+
+fprintf('\nTheoretical input impedance: %.4f Ohms\n',Zin_design);
+fprintf('Theoretical reflection at 20 MHz: %.8f\n', ...
+    abs(Gamma_design));
