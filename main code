@@ -1,0 +1,28 @@
+
+% PHYSICAL CONSTANTS AND MATERIAL PROPERTIES
+
+c0 = 3e8;                    % Speed of light (m/s)
+mu0 = 4*pi*1e-7;             % Free-space permeability
+eps0 = 1/(mu0*c0^2);         % Free-space permittivity
+eta0 = sqrt(mu0/eps0);       % Free-space impedance
+
+f0 = 20e6;                   % Design frequency (Hz)
+
+eps1 = 2;
+eps2 = 3;
+epsL = 2.25;
+
+mu1 = 1;
+mu2 = 1;
+muL = 1;
+
+eta1 = eta0/sqrt(eps1);
+eta2 = eta0/sqrt(eps2);
+etaL = eta0/sqrt(epsL);
+
+fprintf('ANTI-REFLECTIVE COATING DESIGN\n');
+
+fprintf('Free-space impedance: %.2f Ohms\n',eta0);
+fprintf('Layer 1 impedance: %.2f Ohms\n',eta1);
+fprintf('Layer 2 impedance: %.2f Ohms\n',eta2);
+fprintf('Substrate impedance: %.2f Ohms\n',etaL);
