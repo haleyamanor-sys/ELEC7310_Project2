@@ -44,3 +44,32 @@ Gamma_design = (Zin_design-eta0)/(Zin_design+eta0);
 fprintf('\nTheoretical input impedance: %.4f Ohms\n',Zin_design);
 fprintf('Theoretical reflection at 20 MHz: %.8f\n', ...
     abs(Gamma_design));
+
+% Frequency range
+f_analytical = linspace(1e6,50e6,1500);
+
+Gamma_analytical = zeros(size(f_analytical));
+
+for k = 1:length(f_analytical)
+
+    f = f_analytical(k);
+
+    % Phase constants
+    beta1 = 2*pi*f*sqrt(eps1*mu1)/c0;
+    beta2 = 2*pi*f*sqrt(eps2*mu2)/c0;
+
+    % Input impedance looking into Layer 2
+    Zin2 = eta2 * ...
+        (etaL + 1j*eta2*tan(beta2*d2)) / ...
+        (eta2 + 1j*etaL*tan(beta2*d2));
+
+    % Input impedance looking into Layer 1
+    Zin1 = eta1 * ...
+        (Zin2 + 1j*eta1*tan(beta1*d1)) / ...
+        (eta1 + 1j*Zin2*tan(beta1*d1));
+
+    % Overall reflection coefficient
+    Gamma_analytical(k) = ...
+        (Zin1-eta0)/(Zin1+eta0);
+
+end
