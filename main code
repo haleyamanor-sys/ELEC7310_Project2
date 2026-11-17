@@ -73,3 +73,56 @@ for k = 1:length(f_analytical)
         (Zin1-eta0)/(Zin1+eta0);
 
 end
+
+% FDTD SIMULATION PARAMETERS
+
+dx = 0.05;                  % Spatial step (m)
+
+% Courant stability condition
+dt = 0.95*dx/(c0*sqrt(eps2*mu2));
+
+xmax = 100;                 % Simulation domain (m)
+x = 0:dx:xmax;
+
+Nx = length(x);
+
+tmax = 1.5e-6;              % Simulation duration (s)
+Nt = ceil(tmax/dt);
+
+t = (0:Nt-1)*dt;
+
+% Source and measurement positions
+source_x = 8;
+probe_x = 14;
+
+[~,isrc] = min(abs(x-source_x));
+[~,iprobe] = min(abs(x-probe_x));
+
+% DEFINE MATERIAL DISTRIBUTION
+
+% Reference simulation: Air everywhere
+epsr_ref = ones(1,Nx);
+
+% Coated simulation
+epsr = ones(1,Nx);
+
+% Layer boundaries
+x1 = 25;
+x2 = x1+d1;
+x3 = x2+d2;
+
+% Snap boundaries to nearest FDTD grid points
+i1 = round(x1/dx)+1;
+i2 = round(x2/dx)+1;
+i3 = round(x3/dx)+1;
+
+% Assign dielectric materials
+epsr(i1:i2-1) = eps1;
+epsr(i2:i3-1) = eps2;
+epsr(i3:end) = epsL;
+
+fprintf('Actual Layer 1 thickness: %.4f m\n', ...
+    (i2-i1)*dx);
+
+fprintf('Actual Layer 2 thickness: %.4f m\n', ...
+    (i3-i2)*dx);
