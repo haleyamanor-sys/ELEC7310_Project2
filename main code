@@ -230,3 +230,125 @@ title('Material Distribution of Anti-Reflective Coating');
 
 grid on;
 ylim([0 3.5]);
+
+% PLOT TIME-DOMAIN ELECTRIC FIELDS
+
+figure;
+
+plot(t*1e9,E_reference,'LineWidth',1.5);
+hold on;
+
+plot(t*1e9,E_coated,'LineWidth',1.5);
+
+xlabel('Time (ns)');
+ylabel('Electric Field (V/m)');
+
+title('Reference and Coated Electric Fields');
+
+legend('Reference','Coated');
+
+grid on;
+
+% PLOT REFLECTED ELECTRIC FIELD
+
+figure;
+
+plot(t*1e9,E_reflected,'LineWidth',1.5);
+
+xlabel('Time (ns)');
+ylabel('Electric Field (V/m)');
+
+title('Extracted Reflected Electric Field');
+
+grid on;
+
+% ANALYTICAL REFLECTION COEFFICIENT
+
+figure;
+
+plot(f_analytical/1e6, ...
+    abs(Gamma_analytical),'LineWidth',2);
+
+hold on;
+
+xline(20,'--r','20 MHz Design Frequency');
+
+xlabel('Frequency (MHz)');
+ylabel('Reflection Coefficient Magnitude');
+
+title('Analytical Reflection Coefficient vs Frequency');
+
+grid on;
+ylim([0 1]);
+
+% ANALYTICAL VS FDTD COMPARISON
+
+figure;
+
+plot(f_valid/1e6, ...
+    abs(Gamma_analytical_FDTD),'LineWidth',2);
+
+hold on;
+
+plot(f_valid/1e6, ...
+    Gamma_mag(valid),'--','LineWidth',2);
+
+xline(20,'--r','20 MHz Design Frequency');
+
+xlabel('Frequency (MHz)');
+ylabel('Reflection Coefficient Magnitude');
+
+title('Analytical vs FDTD Reflection Coefficient');
+
+legend('Analytical','FDTD','20 MHz');
+
+grid on;
+ylim([0 1]);
+
+% REFLECTION COEFFICIENT IN DECIBELS
+
+figure;
+
+plot(f_valid/1e6, ...
+    20*log10(max(abs(Gamma_analytical_FDTD),1e-12)), ...
+    'LineWidth',2);
+
+hold on;
+
+plot(f_valid/1e6, ...
+    Gamma_dB(valid),'--','LineWidth',2);
+
+xline(20,'--r','20 MHz Design Frequency');
+
+xlabel('Frequency (MHz)');
+ylabel('Reflection Coefficient (dB)');
+
+title('Analytical vs FDTD Reflection in dB');
+
+legend('Analytical','FDTD','20 MHz');
+
+grid on;
+
+% DISPLAY RESULTS AT 20 MHz
+
+[~,idx_analytical] = min(abs(f_analytical-f0));
+
+[~,idx_FDTD] = min(abs(f_valid-f0));
+
+Gamma_A = abs(Gamma_analytical(idx_analytical));
+Gamma_N = Gamma_mag(find(valid,1,'first')+idx_FDTD-1);
+
+fprintf('FINAL SIMULATION RESULTS\n');
+
+fprintf('Design frequency: %.2f MHz\n',f0/1e6);
+
+fprintf('Analytical reflection: %.8f\n',Gamma_A);
+fprintf('FDTD reflection: %.8f\n',Gamma_N);
+
+fprintf('Analytical reflection (dB): %.4f dB\n', ...
+    20*log10(max(Gamma_A,1e-12)));
+
+fprintf('FDTD reflection (dB): %.4f dB\n', ...
+    20*log10(max(Gamma_N,1e-12)));
+
+fprintf('\nSimulation completed successfully.\n');
