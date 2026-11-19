@@ -126,3 +126,39 @@ fprintf('Actual Layer 1 thickness: %.4f m\n', ...
 
 fprintf('Actual Layer 2 thickness: %.4f m\n', ...
     (i3-i2)*dx);
+
+% GAUSSIAN-MODULATED SINUSOIDAL SOURCE
+
+sigma_t = 25e-9;
+t0 = 6*sigma_t;
+
+source = sin(2*pi*f0*(t-t0)) .* ...
+    exp(-((t-t0).^2)/(2*sigma_t^2));
+
+% REFERENCE FDTD SIMULATION
+
+fprintf('\nRunning reference FDTD simulation...\n');
+
+E_reference = runFDTD( ...
+    epsr_ref,dx,dt,Nt,Nx,isrc,iprobe, ...
+    source,eps0,mu0,c0);
+
+fprintf('Reference simulation complete.\n');
+
+% COATED FDTD SIMULATION
+
+fprintf('\nRunning coated FDTD simulation...\n');
+
+E_coated = runFDTD( ...
+    epsr,dx,dt,Nt,Nx,isrc,iprobe, ...
+    source,eps0,mu0,c0);
+
+fprintf('Coated simulation complete.\n');
+
+% EXTRACT INCIDENT AND REFLECTED FIELDS
+
+% Incident field from reference simulation
+E_incident = E_reference;
+
+% Reflected field from subtraction
+E_reflected = E_coated-E_reference;
