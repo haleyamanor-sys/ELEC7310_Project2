@@ -352,3 +352,60 @@ fprintf('FDTD reflection (dB): %.4f dB\n', ...
     20*log10(max(Gamma_N,1e-12)));
 
 fprintf('\nSimulation completed successfully.\n');
+
+% FDTD FUNCTION
+
+function Eprobe = runFDTD( ...
+    epsr,dx,dt,Nt,Nx,isrc,iprobe, ...
+    source,eps0,mu0,c0)
+
+    % Initialize fields
+    E = zeros(1,Nx);
+    H = zeros(1,Nx-1);
+
+    % Material permittivity
+    epsilon = eps0*epsr;
+
+    % Mur absorbing boundary coefficients
+    Sleft = c0*dt/dx;
+
+    cright = c0/sqrt(epsr(end));
+    Sright = cright*dt/dx;
+
+    kleft = (Sleft-1)/(Sleft+1);
+    kright = (Sright-1)/(Sright+1);
+
+    % Store previous electric field
+    Eprobe = zeros(1,Nt);
+
+    % Time stepping loop
+    for n = 1:Nt
+
+        % Update magnetic field
+        H = H-(dt/(mu0*dx))*diff(E);
+
+        % Save previous electric field
+        Eold = E;
+
+        % Update electric field
+        E(2:Nx-1) = E(2:Nx-1) - ...
+            (dt./(epsilon(2:Nx-1)*dx)) .* ...
+            (H(2:end)-H(1:end-1));
+
+        % Left Mur absorbing boundary
+        E(1) = Eold(2)+ ...
+            kleft*(E(2)-Eold(1));
+
+        % Right Mur absorbing boundary
+        E(Nx) = Eold(Nx-1)+ ...
+            kright*(E(Nx-1)-Eold(Nx));
+
+        % Apply source
+        E(isrc) = source(n);
+
+        % Record probe field
+        Eprobe(n) = E(iprobe);
+
+    end
+
+end
